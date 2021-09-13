@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, jsonify, abort
+from flask import Flask, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from sqlalchemy import UniqueConstraint
@@ -24,31 +24,30 @@ class ProductUser(db.Model):
     user_id = db.Column(db.Integer)
     product_id = db.Column(db.Integer)
 
-    UniqueConstraint('user_id', 'product_id', name='user_product_unique')
+    __table_args__ = (db.UniqueConstraint('user_id', 'product_id'),)
 
 
 @app.route('/api/products')
-def hello_world():
+def get_all():
     return jsonify(Product.query.all())
 
 
-@app.route('/api/products/<int:id>/like', methods=['POST'])
-def like(id):
-    # req = requests.get('http://admin:8000/api/user')
+@app.route('/api/products/<int:_id>/like', methods=['POST'])
+def like(_id):
     req = requests.get('http://docker.for.mac.localhost:8000/api/user')
     json = req.json()
 
     try:
-        productUser = ProductUser(user_id=json['id'], product_id=id)
-        db.session.add(productUser)
-        db.session.commit()
+        product_user = ProductUser(user_id=json['id'], product_id=_id)
 
-        publish('product_liked', id)
+        db.session.add(product_user)
+        db.session.commit()
+        publish('product_liked', _id)
     except:
-        abort(400, 'You already liked this product')
+        return make_response(jsonify({'message':'You already liked this product'}), 400)
 
     return jsonify({
-        'message': 'success'
+        'message': f'Product {_id} liked'
     })
 
 

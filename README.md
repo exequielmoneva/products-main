@@ -32,5 +32,27 @@ After that, simply run the following command inside the root folder:
 docker-compose up
 ```
 
+# API specification
+
+| Task | URL | Method | Response code | Response |
+|:----:|:---:|:------:|:-------------:|:--------:|
+| Create an Object | localhost:8000/api/products | POST | 201 | Object created|
+| Like an Object | localhost:8001/api/products/product_id/like | POST | 201 | Like applied|
+| Read all entries | localhost:8000/api/products | GET | 200 | All entries |
+| Read Product by id | localhost:8000/api/products/product_id | GET | 200 | Product belonging to that id |
+| Update Product | localhost:8000/api/products/product_id | UPDATE | 200 | Updated product | 
+| Delete Product | localhost:8000/api/products/product_id | DELETE | 200 | Status |
+
+## Body example for the POST endpoint
+```json
+{
+    "title":"Product name example",
+    "image":"image url example"
+}
+```
+
+
+
+
 # TO-DO
 - Unit and integration tests

@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+
 from controllers.product_controllers import ProductController, ProductLikeController
 from models.dbmodels import db
 

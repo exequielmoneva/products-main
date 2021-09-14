@@ -1,12 +1,13 @@
 import json
-import pika
-from models.dbmodels import Product
-from app import db
 
-params = pika.URLParameters('amqps://rinseenq:iZkfHfgARAZ5YlARbX6yKDS0yYhxcn-X@beaver.rmq.cloudamqp.com/rinseenq')
+import pika
+
+from app import db
+from models.dbmodels import Product
+
+params = pika.URLParameters('your_rabbitmq_url')
 
 connection = pika.BlockingConnection(params)
-
 
 channel = connection.channel()
 

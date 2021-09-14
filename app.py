@@ -1,54 +1,34 @@
-import requests
-from flask import Flask, jsonify, make_response
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
 from flask_cors import CORS
-from sqlalchemy import UniqueConstraint
-
-from producer import publish
+from controllers.product_controllers import ProductController, ProductLikeController
+from models.dbmodels import db
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql://root:root@db/main'
 CORS(app)
-
-db = SQLAlchemy(app)
-
-
-class Product(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=False)
-    title = db.Column(db.String(200))
-    image = db.Column(db.String(200))
-
-
-class ProductUser(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    product_id = db.Column(db.Integer)
-
-    __table_args__ = (db.UniqueConstraint('user_id', 'product_id'),)
+db.app = app
+db.init_app(app)
+with app.app_context():
+    db.create_all()
 
 
 @app.route('/api/products')
-def get_all():
-    return jsonify(Product.query.all())
+def get():
+    """
+    Get all products
+    :return: list of all products
+    """
+    return ProductController().get_all()
 
 
 @app.route('/api/products/<int:_id>/like', methods=['POST'])
-def like(_id):
-    req = requests.get('http://docker.for.mac.localhost:8000/api/user')
-    json = req.json()
-
-    try:
-        product_user = ProductUser(user_id=json['id'], product_id=_id)
-
-        db.session.add(product_user)
-        db.session.commit()
-        publish('product_liked', _id)
-    except:
-        return make_response(jsonify({'message':'You already liked this product'}), 400)
-
-    return jsonify({
-        'message': f'Product {_id} liked'
-    })
+def post(_id):
+    """
+    give a like to a product
+    :param _id: product id
+    :return: confirmation message
+    """
+    return ProductLikeController().like(_id, db)
 
 
 if __name__ == '__main__':

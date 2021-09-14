@@ -1,11 +1,10 @@
 import json
 import pika
-
-from app import Product, db
+from models.dbmodels import Product
+from app import db
 
 params = pika.URLParameters('amqps://rinseenq:iZkfHfgARAZ5YlARbX6yKDS0yYhxcn-X@beaver.rmq.cloudamqp.com/rinseenq')
 
-# connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 connection = pika.BlockingConnection(params)
 
 
